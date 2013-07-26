@@ -48,38 +48,47 @@ angular.module('app.controllers', [])
   $scope
 ])
 
-.controller('TodoCtrl', [
+.controller('HomeCtrl', [
   '$scope'
 
 ($scope) ->
-
-  $scope.todos = [
-    text: "learn angular"
-    done: true
-  ,
-    text: "build an angular app"
-    done: false
+  
+  $scope.factors = [
+    description:'Sample Factor'
   ]
-
-  $scope.addTodo = ->
-    $scope.todos.push
-      text: $scope.todoText
-      done: false
-
-    $scope.todoText = ""
-
-  $scope.remaining = ->
-    count = 0
-    angular.forEach $scope.todos, (todo) ->
-      count += (if todo.done then 0 else 1)
-
-    count
-
-  $scope.archive = ->
-    oldTodos = $scope.todos
-    $scope.todos = []
-    angular.forEach oldTodos, (todo) ->
-      $scope.todos.push todo  unless todo.done
+  
+  $scope.pairwise = [[]]
+  $scope.pairwisefractions = [[]]
+  
+  $scope.columnSum = []
+  $scope.columnSumUnit = []
+  $scope.rowSum = []
+  
+  $scope.$watch 'pairwise',->
+    $scope.columnSum = []
+    $scope.columnSumUnit = []
+    $scope.rowSum = []
+    for row,i in $scope.pairwise
+      for column,j in row
+        column = $scope.pairwisefractions[i][j] = eval(column)
+        $scope.columnSum[j] = 0 if $scope.columnSum[j] is undefined
+        $scope.columnSum[j] = $scope.columnSum[j] + parseFloat(column)
+    for v1, i in $scope.factors
+      $scope.rowSum[i] = 0 if $scope.rowSum[i] is undefined
+      for v2, j in $scope.factors
+        $scope.columnSumUnit[j] = 0 if $scope.columnSumUnit[j] is undefined
+        $scope.columnSumUnit[j] = $scope.columnSumUnit[j] + $scope.pairwisefractions[i][j]/$scope.columnSum[j]
+        $scope.rowSum[i] = $scope.rowSum[i] + $scope.pairwisefractions[i][j]/$scope.columnSum[j]
+      $scope.rowSum[i] = $scope.rowSum[i]/$scope.factors.length
+  , true
+    
+  
+  $scope.addFactor=()->
+    $scope.factors.push(description:'New Factor')
+    $scope.pairwise.push([])
+    $scope.pairwisefractions.push([])
+    
+  
 
 ])
 
